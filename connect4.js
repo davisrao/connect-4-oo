@@ -1,3 +1,4 @@
+"use strict";
 /** Connect Four
  *
  * Player 1 and 2 alternate turns. On each turn, a piece is dropped down a
@@ -8,6 +9,7 @@
 
 class Game {
   constructor(height = 6, width = 7, currPlayer = 1, board = []) {
+    this.handleClick = this.handleClick.bind(this);
     this.height = height;
     this.width = width;
     this.currPlayer = currPlayer;
@@ -34,8 +36,7 @@ class Game {
     const top = document.createElement('tr');
     top.setAttribute('id', 'column-top');
     console.log('makeHTMLBoard', this);
-    let boundHandleClick = this.handleClick.bind(this);
-    top.addEventListener('click', boundHandleClick);
+    top.addEventListener('click', this.handleClick);
 
     for (let x = 0; x < this.width; x++) {
       const headCell = document.createElement('td');
@@ -102,21 +103,20 @@ class Game {
 
     // place piece in board and add to HTML table
     this.board[y][x] = this.currPlayer;
-    console.log('handle Click ', this);
+
     this.placeInTable(y, x);
 
     // check for win
-    let boundCheckForWin = this.checkForWin.bind(this);
-    let boundEndGame = this.endGame.bind(this);
-    console.log('checking bound win: ',boundCheckForWin)
+    // let boundCheckForWin = this.checkForWin.bind(this);
+    // let boundEndGame = this.endGame.bind(this);
 
-    if (boundCheckForWin()) {
-      return boundEndGame(`Player ${this.currPlayer} won!`);
+    if (this.checkForWin()) {
+      return this.endGame(`Player ${this.currPlayer} won!`);
     }
 
     // check for tie
     if (this.board.every(row => row.every(cell => cell))) {
-      return boundEndGame('Tie!');
+      return this.endGame('Tie!');
     }
 
     // switch players
@@ -127,7 +127,8 @@ class Game {
 
   checkForWin() {
     console.log('check for win1 ',this);
-    function _win(cells) {
+
+    const _win = (cells) => {
       // Check four cells to see if they're all color of current player
       //  - cells: list of four (y, x) cells
       //  - returns true if all are legal coordinates & all match this.currPlayer
@@ -153,8 +154,8 @@ class Game {
         const diagDL = [[y, x], [y + 1, x - 1], [y + 2, x - 2], [y + 3, x - 3]];
 
         // find winner (only checking each win-possibility as needed)
-        let boundSubWin = _win.bind(this);
-        if (boundSubWin(horiz) || boundSubWin(vert) || boundSubWin(diagDR) || boundSubWin(diagDL)) {
+        // let boundSubWin = _win.bind(this);
+        if (_win(horiz) || _win(vert) || _win(diagDR) || _win(diagDL)) {
           return true;
         }
       }
