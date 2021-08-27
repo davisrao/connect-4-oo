@@ -102,16 +102,21 @@ class Game {
 
     // place piece in board and add to HTML table
     this.board[y][x] = this.currPlayer;
-    placeInTable(y, x);
+    console.log('handle Click ', this);
+    this.placeInTable(y, x);
 
     // check for win
-    if (checkForWin()) {
-      return endGame(`Player ${this.currPlayer} won!`);
+    let boundCheckForWin = this.checkForWin.bind(this);
+    let boundEndGame = this.endGame.bind(this);
+    console.log('checking bound win: ',boundCheckForWin)
+
+    if (boundCheckForWin()) {
+      return boundEndGame(`Player ${this.currPlayer} won!`);
     }
 
     // check for tie
     if (this.board.every(row => row.every(cell => cell))) {
-      return endGame('Tie!');
+      return boundEndGame('Tie!');
     }
 
     // switch players
@@ -121,10 +126,12 @@ class Game {
   /** checkForWin: check board cell-by-cell for "does a win start here?" */
 
   checkForWin() {
+    console.log('check for win1 ',this);
     function _win(cells) {
       // Check four cells to see if they're all color of current player
       //  - cells: list of four (y, x) cells
       //  - returns true if all are legal coordinates & all match this.currPlayer
+      console.log('win_: ', this);
 
       return cells.every(
         ([y, x]) =>
@@ -146,7 +153,8 @@ class Game {
         const diagDL = [[y, x], [y + 1, x - 1], [y + 2, x - 2], [y + 3, x - 3]];
 
         // find winner (only checking each win-possibility as needed)
-        if (_win(horiz) || _win(vert) || _win(diagDR) || _win(diagDL)) {
+        let boundSubWin = _win.bind(this);
+        if (boundSubWin(horiz) || boundSubWin(vert) || boundSubWin(diagDR) || boundSubWin(diagDL)) {
           return true;
         }
       }
